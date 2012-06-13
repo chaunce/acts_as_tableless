@@ -1,0 +1,6 @@
+= ActsAsTableless
+
+Create tableless activerecord objects that support associations and validations.
+
+1. Install gem
+2. Add `acts_as_tableless` to a activerecord model
