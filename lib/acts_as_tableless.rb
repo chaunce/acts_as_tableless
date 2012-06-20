@@ -76,7 +76,7 @@ module ActiveRecord
         if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           if options.include?(:through)
-            define_method(association_class.name.pluralize.underscore) do
+            define_method(association_id.to_s) do
               through_objects = self.send(options[:through])
               records = if through_objects.nil?
                 []
@@ -89,9 +89,9 @@ module ActiveRecord
               records.instance_variable_set(:@options, options)
               records.instance_variable_set(:@association_class, association_class)
               def records.<<(associated_records)
+                associated_records = [associated_records] unless associated_records.is_a?(Array)
                 case @parent.class.reflect_on_all_associations.select{|association| association.name == @options[:through]}.first.macro
                 when :has_many
-                  associated_records = [associated_records] unless associated_records.is_a?(Array)
                   associated_records.each do |associated_record|
                     raise ActiveRecord::AssociationTypeMismatch, "#{@association_class.name} expected, got #{associated_record.inspect}" unless @association_class.name == associated_record.class.name
                     @parent.send(@options[:through]).send(:new, "#{@association_class.name.underscore}_id".to_sym => associated_record.id)
@@ -121,7 +121,7 @@ module ActiveRecord
               return records
             end
           else
-            define_method(association_class.name.pluralize.underscore) do
+            define_method(association_id.to_s) do
               association_class.all.select{|record| record.send("#{self.class.name.underscore}_id") == self.id}
             end
           end
@@ -134,13 +134,13 @@ module ActiveRecord
         if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           if options.include?(:through)
-            define_method(association_class.name.pluralize.underscore) do
+            define_method(association_id.to_s) do
               through_object = self.send(options[:through])
               return nil if through_object.nil?
               association_class.find(through_object.send("#{association_class.name.underscore}_id"))
             end
           else
-            define_method(association_class.name.pluralize.underscore) do
+            define_method(association_id.to_s) do
               association_class.all.select{|record| record.send("#{self.class.name.underscore}_id") == self.id}.first
             end
           end
@@ -152,7 +152,7 @@ module ActiveRecord
         class_variable_name = association_id.to_s.singularize
         if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
-          define_method(association_class.name.underscore) do
+          define_method(association_id.to_s) do
             association_class.find(self.send("#{association_class.name.underscore}_id"))
           end
         end
