@@ -9,13 +9,17 @@ Note:
 
 This gem relies on String#singularize which is known to have some problems.  To correct errors such as:
 
-<tt>uninitialized constant Statu (NameError)</tt>
+<tt>
+uninitialized constant Statu (NameError)
+</tt>
 
 please add something similar to:
 
-<tt>ActiveSupport::Inflector.inflections do |inflect|
+<tt>
+ActiveSupport::Inflector.inflections do |inflect|
   inflect.singular("statuses", "status")
   inflect.singular("status", "status")
-end</tt>
+end
+</tt>
 
 to your environment.rb file before the Application.initialize! line
