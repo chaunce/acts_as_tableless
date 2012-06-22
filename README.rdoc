@@ -4,3 +4,18 @@ Create tableless activerecord objects that support associations and validations.
 
 1. Install gem
 2. Add `acts_as_tableless` to a activerecord model
+
+Note:
+
+This gem relies on String#singularize which is known to have some problems.  To correct errors such as:
+
+<tt>uninitialized constant Statu (NameError)</tt>
+
+please add something similar to:
+
+<tt>ActiveSupport::Inflector.inflections do |inflect|
+  inflect.singular("statuses", "status")
+  inflect.singular("status", "status")
+end</tt>
+
+to your environment.rb file before the Application.initialize! line

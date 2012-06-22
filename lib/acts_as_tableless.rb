@@ -49,7 +49,7 @@ module ActsAsTableless
     end
 
     def readonly?
-      true
+      false
     end
 
     def save(validate = true)
@@ -57,6 +57,8 @@ module ActsAsTableless
         ActsAsTableless.class.class_variable_set(:"@@#{self.class.name.underscore}", ActsAsTableless.class_variable_get(:"@@#{self.class.name.underscore}").push(self))
       end
     end
+    
+    alias :save! :save
   end
 end
 
@@ -73,7 +75,7 @@ module ActiveRecord
       def has_many(association_id, options = {}, &extension)
         active_record_has_many(association_id, options, &extension)
         class_variable_name = association_id.to_s.singularize
-        if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
+        if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           if options.include?(:through)
             define_method(association_id.to_s) do
@@ -131,7 +133,7 @@ module ActiveRecord
       def has_one(association_id, options = {})
         active_record_has_one(association_id, options)
         class_variable_name = association_id.to_s.singularize
-        if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
+        if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           if options.include?(:through)
             define_method(association_id.to_s) do
@@ -150,7 +152,7 @@ module ActiveRecord
       def belongs_to(association_id, options = {})
         active_record_belongs_to(association_id, options)
         class_variable_name = association_id.to_s.singularize
-        if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
+        if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           define_method(association_id.to_s) do
             association_class.find(self.send("#{association_class.name.underscore}_id"))
@@ -161,7 +163,7 @@ module ActiveRecord
       def has_and_belongs_to_many(association_id, options = {}, &extension)
         active_record_has_and_belongs_to_many(association_id, options, &extension)
         class_variable_name = association_id.to_s.singularize
-        if ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
+        if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           # not yet implemented
           []
