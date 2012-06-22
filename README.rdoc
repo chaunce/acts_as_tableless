@@ -3,7 +3,7 @@
 Create tableless activerecord objects that support associations and validations.
 
 1. Install gem
-2. Add `acts_as_tableless` to a activerecord model
+2. Add <tt>acts_as_tableless</tt> to a activerecord model
 
 Note:
 
@@ -18,4 +18,4 @@ please add something similar to:
     inflect.singular("status", "status")
   end
 
-to your environment.rb file before the Application.initialize! line
+to your environment.rb file before the <tt>Application.initialize!</tt> line
