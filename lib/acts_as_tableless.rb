@@ -37,8 +37,25 @@ module ActsAsTableless
         def all
           ActsAsTableless.class_variable_get(:"@@#{self.name.underscore}")
         end
+        
+        def find(id)
+          ActsAsTableless.class_variable_get(:"@@#{self.name.underscore}").select{|record| record.id == id}.first
+        end
+        
+        def delete(ids)
+          ids = [ids] unless ids.is_a?(Array)
+          # this might be able to be inproved
+          ids.each do |id|
+            find(id).delete
+          end
+        end
+        
+        def exists?(id)
+          find(id).nil? ? false : true
+        end
       end
       ActsAsTableless.class_variable_set(:"@@#{self.name.underscore}", [])
+      ActsAsTableless.class_variable_set(:"@@#{self.name.underscore}_increment", 0)
       include InstanceMethods
     end
   end
@@ -47,18 +64,27 @@ module ActsAsTableless
     def persisted?
       false
     end
-
+    
     def readonly?
-      false
+      true
     end
 
     def save(validate = true)
+      self.id ||= ActsAsTableless.class_variable_set(:"@@#{self.class.name.underscore}_increment", (ActsAsTableless.class_variable_get(:"@@#{self.class.name.underscore}_increment") + 1))
+      raise "Duplicate ID" if self.class.send(:find, self.id) # these are read only
       if validate ? valid? : true
         ActsAsTableless.class.class_variable_set(:"@@#{self.class.name.underscore}", ActsAsTableless.class_variable_get(:"@@#{self.class.name.underscore}").push(self))
+        return self
       end
     end
     
+    def delete
+      ActsAsTableless.class.class_variable_set(ActsAsTableless.class_variable_get(:"@@#{self.class.name.underscore}").delete(self))
+      return true
+    end
+    
     alias :save! :save
+    alias :delete! :delete
   end
 end
 
@@ -84,7 +110,8 @@ module ActiveRecord
                 []
               else
                 through_objects = [through_objects] unless through_objects.is_a?(Array)
-                through_objects.collect{|object| association_class.find(object.send("#{association_class.name.underscore}_id")) }
+                through_association_id = [:has_one, :belongs_to].include?( options[:through].to_s.singularize.camelize.constantize.reflect_on_all_associations.select{ |associations| associations.name.to_s == class_variable_name }.first.macro ) ? association_id.to_s.singularize.to_sym : association_id
+                through_objects.collect{|object| object.send(through_association_id) }.flatten
               end
 
               records.instance_variable_set(:@parent, self)
@@ -108,7 +135,7 @@ module ActiveRecord
                   # not yet implemented
                   []
                 end
-                @parent.roles
+                self
               end
               # def records.create(attributes = nil, options = {})
               #   if attributes.is_a?(Array)
@@ -124,7 +151,18 @@ module ActiveRecord
             end
           else
             define_method(association_id.to_s) do
-              association_class.all.select{|record| record.send("#{self.class.name.underscore}_id") == self.id}
+              records = association_class.all.select{|record| record.send("#{self.class.name.underscore}_id") == self.id}
+              
+              records.instance_variable_set(:@parent, self)
+              records.instance_variable_set(:@association_class, association_class)
+              def records.create(attributes)
+                new_record = @association_class.new(attributes)
+                new_record.send("#{@parent.class.name.underscore}_id=", @parent.id)
+                new_record.save
+                return new_record
+              end
+              
+              return records
             end
           end
         end
@@ -155,7 +193,7 @@ module ActiveRecord
         if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
           define_method(association_id.to_s) do
-            association_class.find(self.send("#{association_class.name.underscore}_id"))
+            association_class.all.select{|record| record.id == self.send("#{association_class.name.underscore}_id")}.first
           end
         end
       end
@@ -165,8 +203,10 @@ module ActiveRecord
         class_variable_name = association_id.to_s.singularize
         if class_variable_name.camelize.constantize.send(:included_modules).include?(ActsAsTableless) # || ActsAsTableless.class_variables.include?(:"@@#{class_variable_name}")
           association_class = class_variable_name.camelize.constantize rescue nil
-          # not yet implemented
-          []
+          # not yet implemented, may never be
+          define_method(association_id.to_s) do
+            []
+          end
         end
       end
     end

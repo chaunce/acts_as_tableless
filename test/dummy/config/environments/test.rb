@@ -35,3 +35,6 @@ Dummy::Application.configure do
   # Print deprecation notices to the stderr
   config.active_support.deprecation = :stderr
 end
+
+# # # remove line below after testing
+Debugger.settings[:autoeval] = true
