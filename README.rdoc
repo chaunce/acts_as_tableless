@@ -72,13 +72,13 @@ Create tableless activerecord objects that support associations and validations.
 
   @user = User.create(:name => "User")
   
-  @user.shapes.create(:name => "Octagon")		#=> #<Shape id: 1, name: "Octagon", user_id: 1>
+  @user.shapes.create(:name => "Octagon") #=> #<Shape id: 1, name: "Octagon", user_id: 1>
   
-  @user.colors << Color.create([{:name => "Green"},{:name => "Blue"}])		#=> [#<Color id: 1, name: "Green">, #<Color id: 2, name: "Blue">]
+  @user.colors << Color.create([{:name => "Green"},{:name => "Blue"}]) #=> [#<Color id: 1, name: "Green">, #<Color id: 2, name: "Blue">]
   
-  @user.size.create(:name => "Large")		#=> #<Size id: 1, name: "Large", user_id: 1>
+  @user.size.create(:name => "Large") #=> #<Size id: 1, name: "Large", user_id: 1>
   
-  @user.number = Number.create(name: "One")		#=> #<Number id: 1, name: "One">
+  @user.number = Number.create(name: "One") #=> #<Number id: 1, name: "One">
 
 More stuff in the test file.
 
