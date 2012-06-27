@@ -14,5 +14,4 @@ gem "jquery-rails"
 # your gem to rubygems.org.
 
 # To use debugger
-# # # comment out line below after testing
-gem 'debugger'
+# gem 'debugger'
