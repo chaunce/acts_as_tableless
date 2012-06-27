@@ -10,75 +10,75 @@ Create tableless activerecord objects that support associations and validations.
 
 == Usage:
 
-	 class User < ActiveRecord::Base
-	  has_many :shapes
-	  has_many :user_colors
-	  has_many :colors, :through => :user_colors
-	  has_one :size
-	  belongs_to :number
-	  attr_accessible :name, :number_id, :letter_id
-	end
-
-	class Color < ActiveRecord::Base
-	  acts_as_tableless
-	  column :id, :integer
-	  column :name, :string
-	  attr_accessible :id, :name
-	  belongs_to :user_colors
-	end
-
-	class Letter < ActiveRecord::Base
-	  acts_as_tableless
-	  column :id, :integer
-	  column :name, :string
-	  column :user_id, :integer
-	  attr_accessible :id, :name, :user_id
-	  has_and_belongs_to_many :users
-	end
-
-	class Number < ActiveRecord::Base
-	  acts_as_tableless
-	  column :id, :integer
-	  column :name, :string
-	  attr_accessible :id, :name
-	  has_many :users
-	end
-
-	class Shape < ActiveRecord::Base
-	  acts_as_tableless
-	  column :id, :integer
-	  column :name, :string
-	  column :user_id, :integer
-	  attr_accessible :id, :name, :user_id
-	  belongs_to :user
-	end
-
-	class Size < ActiveRecord::Base
-	  acts_as_tableless
-	  column :id, :integer
-	  column :name, :string
-	  column :user_id, :integer
-	  attr_accessible :id, :name, :user_id
-	  belongs_to :user
-	end
-
-	class UserColor < ActiveRecord::Base
-	  belongs_to :user
-	  belongs_to :color
-	  attr_accessible :user_id, :color_id
-	end
+  class User < ActiveRecord::Base
+  	has_many :shapes
+  	has_many :user_colors
+  	has_many :colors, :through => :user_colors
+  	has_one :size
+  	belongs_to :number
+  	attr_accessible :name, :number_id, :letter_id
+  end
+  
+  class Color < ActiveRecord::Base
+  	acts_as_tableless
+  	column :id, :integer
+  	column :name, :string
+  	attr_accessible :id, :name
+  	belongs_to :user_colors
+  end
+  
+  class Letter < ActiveRecord::Base
+  	acts_as_tableless
+  	column :id, :integer
+  	column :name, :string
+  	column :user_id, :integer
+  	attr_accessible :id, :name, :user_id
+  	has_and_belongs_to_many :users
+  end
+  
+  class Number < ActiveRecord::Base
+  	acts_as_tableless
+  	column :id, :integer
+  	column :name, :string
+  	attr_accessible :id, :name
+  	has_many :users
+  end
+  
+  class Shape < ActiveRecord::Base
+  	acts_as_tableless
+  	column :id, :integer
+  	column :name, :string
+  	column :user_id, :integer
+  	attr_accessible :id, :name, :user_id
+  	belongs_to :user
+  end
+  
+  class Size < ActiveRecord::Base
+  	acts_as_tableless
+  	column :id, :integer
+  	column :name, :string
+  	column :user_id, :integer
+  	attr_accessible :id, :name, :user_id
+  	belongs_to :user
+  end
+  
+  class UserColor < ActiveRecord::Base
+  	belongs_to :user
+  	belongs_to :color
+  	attr_accessible :user_id, :color_id
+  end
 
 == Examples:
 
-	@user = User.create(:name => "User")
-
-	@user.shapes.create(:name => "Octagon")		#=> #<Shape id: 1, name: "Octagon", user_id: 1>
-
-	@user.colors << Color.create([{:name => "Green"},{:name => "Blue"}])		#=> [#<Color id: 1, name: "Green">, #<Color id: 2, name: "Blue">]
-
-	@user.size.create(:name => "Large")		#=> #<Size id: 1, name: "Large", user_id: 1>
-
-	@user.number = Number.create(name: "One")		#=> #<Number id: 1, name: "One">
+  @user = User.create(:name => "User")
+  
+  @user.shapes.create(:name => "Octagon")		#=> #<Shape id: 1, name: "Octagon", user_id: 1>
+  
+  @user.colors << Color.create([{:name => "Green"},{:name => "Blue"}])		#=> [#<Color id: 1, name: "Green">, #<Color id: 2, name: "Blue">]
+  
+  @user.size.create(:name => "Large")		#=> #<Size id: 1, name: "Large", user_id: 1>
+  
+  @user.number = Number.create(name: "One")		#=> #<Number id: 1, name: "One">
 
 More stuff in the test file.
 
