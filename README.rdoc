@@ -96,3 +96,15 @@ please add something similar to:
   end
 
 to your environment.rb file before the <tt>Application.initialize!</tt> line
+
+== Testing:
+
+First setup the test database.
+
+  cd test/dummy
+  rake db:setup && db:test:prepare
+
+Then from the root dir run the tests with Rake.
+
+  cd ../.. # from test/dummy
+  rake test
